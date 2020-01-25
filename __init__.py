@@ -1,11 +1,11 @@
 
 bl_info = {
-    "name": "Second Life Exporter",
+    "name": "TGOR Animation and Export Toolset",
     "author": "Salireths, Hopfel",
     "version": (0, 0, 0),
     "blender": (2, 80, 0),
     "location": "Properties > Modifiers",
-    "description": "Exporting a rig for SL",
+    "description": "Provides a window to speed up animation workflow and export skeletal meshes and animations for Unreal Engine 4 or Second Life",
     "warning": "",
     "wiki_url": "",
     "category": "Import-Export"
