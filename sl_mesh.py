@@ -125,8 +125,10 @@ class SL_OT_FixWeightmaps(Operator):
 
     def execute(self, context):
 
+        FoundAny = False
         for obj in context.selected_objects:
             if obj.type == 'MESH':
+                FoundAny = True
                 for vertex in obj.data.vertices:
                     
                     limit = min(self.limit, len(vertex.groups))
@@ -159,6 +161,10 @@ class SL_OT_FixWeightmaps(Operator):
                     for clean in cleans:
                         obj.vertex_groups[clean].remove([vertex.index])
 
+        if not FoundAny:
+        	self.report({'ERROR'}, "No Mesh selected")
+        	return {'CANCELLED'}
+
         return {'FINISHED'}
 
 
@@ -171,8 +177,10 @@ class SL_OT_ApplyModifiers(Operator):
     def execute(self, context):
 
         error = False
+        FoundAny = False
         for obj in context.selected_objects:
             if obj.type == 'MESH':
+                FoundAny = True
 
                 # copying context for the operator's override
                 contx = bpy.context.copy()
@@ -193,8 +201,12 @@ class SL_OT_ApplyModifiers(Operator):
         
         # Display error if we failed
         if error:
-            self.report({"INFO"}, "Applying modifiers failed for some")
+            self.report({"ERROR"}, "Applying modifiers failed for some")
             return {'CANCELLED'}
+
+        if not FoundAny:
+        	self.report({'ERROR'}, "No Mesh selected")
+        	return {'CANCELLED'}
 
         return {'FINISHED'}
 
@@ -216,8 +228,10 @@ class SL_OT_RenameBones(Operator):
 
     def execute(self, context):
         
+        FoundAny = False
         for obj in context.selected_objects:
             if obj.type == 'ARMATURE':
+                FoundAny = True
                 
                 namelist = sl_const.renameList
 
@@ -234,6 +248,10 @@ class SL_OT_RenameBones(Operator):
                     if not bone is None:
                         bone.name = newname
 
+        if not FoundAny:
+        	self.report({'ERROR'}, "No Armature selected")
+        	return {'CANCELLED'}
+
         return {'FINISHED'}
 
 class SL_OT_RemoveEmptyGroups(Operator):
@@ -244,8 +262,10 @@ class SL_OT_RemoveEmptyGroups(Operator):
 
     def execute(self, context):
 
+        FoundAny = False
         for obj in context.selected_objects:
             if obj.type == 'MESH':
+                FoundAny = True
                 
                 # Initialse weight for all groups to 0 
                 maxWeight = {}
@@ -292,6 +312,10 @@ class SL_OT_RemoveEmptyGroups(Operator):
                     if (maxWeight[key] <= 0) and (key not in marked):
                         obj.vertex_groups.remove(obj.vertex_groups[key])
 
+        if not FoundAny:
+        	self.report({'ERROR'}, "No Mesh selected")
+        	return {'CANCELLED'}
+
         return {'FINISHED'}
 
 class SL_OT_RemoveUnusedGroups(Operator):
@@ -302,8 +326,10 @@ class SL_OT_RemoveUnusedGroups(Operator):
 
     def execute(self, context):
 
+        FoundAny = False
         for obj in context.selected_objects:
             if obj.type == 'MESH':
+                FoundAny = True
                 
                 # Cannot remove during for loop
                 removes = []
@@ -314,6 +340,10 @@ class SL_OT_RemoveUnusedGroups(Operator):
                 # Actually remove
                 for remove in removes:
                     obj.vertex_groups.remove(remove)
+
+        if not FoundAny:
+        	self.report({'ERROR'}, "No Mesh selected")
+        	return {'CANCELLED'}
 
         return {'FINISHED'}
 
@@ -386,7 +416,13 @@ class SL_OT_MeshExport(Operator):
         	meshToExport.hide_select = False
         	meshToExport.hide_set(False)
         	meshToExport.select_set(True)
-                
+        
+        if charRefHndlr.deformRig :
+            charRefHndlr.deformRig.select_set(True)
+
+        if charRefHndlr.controlRig :
+            charRefHndlr.controlRig.select_set(True)
+
         # -----------------------------		
         # Making changes to scene
         
